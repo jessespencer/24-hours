@@ -128,7 +128,7 @@ def enum_case(col: str, order: list[str]) -> str:
 def transform(con: duckdb.DuckDBPyConnection) -> None:
     con.execute(f"""
         create table respondents as
-        select row_number() over (order by hash(r.caseid::varchar || 'poc-c'))::uinteger - 1 as rid,
+        select row_number() over (order by hash(r.caseid::varchar || '24-hours'))::uinteger - 1 as rid,
                r.caseid, r.year::usmallint as year, r.w::float as w,
                l.sex::utinyint as sex,
                (case when l.age < 25 then 0 when l.age < 35 then 1 when l.age < 45 then 2
