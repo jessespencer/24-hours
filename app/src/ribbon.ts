@@ -1,4 +1,7 @@
 import * as d3 from "d3";
+// Side-effect import: adds selection.transition(). d3's package marks itself side-effect
+// free, so without this the production bundle drops it (the dev server doesn't).
+import "d3-transition";
 import { CATEGORY_LABELS, NBINS, clockLabel, colorFor, pct, type Grid, type Layer } from "./config";
 import { tooltip } from "./ui";
 
