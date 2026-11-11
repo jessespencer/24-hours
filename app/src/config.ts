@@ -104,6 +104,17 @@ export function colorFor(layer: Layer, key: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(`--c-${layer}-${key}`).trim() || "#888";
 }
 
+/** The visitor's wall-clock time as minutes since 4:00 a.m. (the diary day's start). */
+export function nowMinute(d = new Date()): number {
+  return (d.getHours() * 60 + d.getMinutes() - 240 + 1440) % 1440;
+}
+
+/** Weekday or weekend for the visitor's current diary day, which runs 4 a.m. to 4 a.m. */
+export function todayDayType(d = new Date()): "weekday" | "weekend" {
+  const dow = new Date(d.getTime() - 4 * 3600_000).getDay();
+  return dow === 0 || dow === 6 ? "weekend" : "weekday";
+}
+
 /** Minutes since 4:00 a.m. -> "6:30 a.m." */
 export function clockLabel(minute: number, short = false): string {
   const m = (240 + Math.round(minute)) % 1440;

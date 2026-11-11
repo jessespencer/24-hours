@@ -19,6 +19,7 @@ export interface AppState {
   a: Slice;
   b: Slice;
   t: number; // minutes since 4:00 a.m.
+  live: boolean; // t follows the visitor's local clock
   speed: number;
   playing: boolean;
   flows: boolean; // show dots travelling between blobs
@@ -59,6 +60,8 @@ export class Store {
       a: decodeSlice(p.get("a"), defaults.a),
       b: decodeSlice(p.get("b"), defaults.b),
       t: num("t", defaults.t),
+      // A link with an explicit time is a frozen moment; without one, follow the clock.
+      live: defaults.live && !p.has("t"),
       speed: num("speed", defaults.speed),
       playing: false,
       flows: p.get("flows") !== "0",
@@ -97,7 +100,7 @@ export class Store {
         p.set("win", s.win);
       }
       if (s.view === "years") p.set("year", String(s.year));
-      p.set("t", String(Math.round(s.t)));
+      if (!s.live) p.set("t", String(Math.round(s.t)));
       if (!s.flows) p.set("flows", "0");
       if (s.speed !== 1) p.set("speed", String(s.speed));
       if (s.theme !== "auto") p.set("theme", s.theme);

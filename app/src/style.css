@@ -271,6 +271,23 @@ line.time-marker { stroke: var(--text-1); stroke-width: 2; pointer-events: none;
   pointer-events: none;
 }
 .stage__top .sample { pointer-events: auto; }
+.stage__clock { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); pointer-events: auto; }
+.now-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 var(--space-3);
+  border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface-1); color: var(--text-2);
+  font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; cursor: pointer;
+  transition: color var(--dur-1), border-color var(--dur-1), background-color var(--dur-1);
+}
+.now-btn:hover { color: var(--text-1); border-color: var(--border-strong); }
+.now-btn__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; }
+.now-btn.is-live { color: var(--accent); border-color: transparent; background: var(--surface-sunk); cursor: default; }
+.now-btn.is-live .now-btn__dot { background: var(--accent); animation: now-pulse 2s var(--ease-out) infinite; }
+@keyframes now-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  100% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .now-btn.is-live .now-btn__dot { animation: none; } }
+@media (max-width: 720px) { .now-btn { min-height: var(--hit); } }
 .clock-display { display: inline-flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
 .clock-display__time {
   font-family: var(--font-display); font-weight: 500; font-size: clamp(40px, 6vw, 72px);

@@ -4,7 +4,7 @@ An interactive, static web app built from American Time Use Survey (ATUS)
 microdata. It shows what people are doing, where, and with whom at every point of
 the day, and lets you slice that by who they are.
 
-- **The day:** about 1,000 resampled diaries shown as dots that move between activity blobs as a 24-hour clock runs. Blobs grow and shrink at the edge facing where people come from or go to. Play/pause, scrub, speed, a live share per blob, and a Flows toggle that fades the dots in transit.
+- **The day:** about 1,000 resampled diaries shown as dots that move between activity blobs as a 24-hour clock runs. Blobs grow and shrink at the edge facing where people come from or go to. It opens live: the clock follows the visitor's local time and, unless the link sets filters, today's weekday or weekend. Scrubbing or playing leaves live mode and "Back to now" returns. Play/pause, scrub, speed, a live share per blob, and a Flows toggle that fades the dots in transit.
 - **Time ribbon:** stacked area of the weighted share of people in each category, in 10-minute bins. Hover for exact shares. This is the default view on phones.
 - **Compare:** two slices side by side, a difference heat strip (A − B, in percentage points), and a minutes-per-person table for a chosen time window (whole day, morning, workday, evening, night). Presets are included.
 - **Color by:** any view can be recolored by activity, location ("Where"), or company ("With whom").

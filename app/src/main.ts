@@ -4,7 +4,7 @@ import "./tokens.css";
 import "./style.css";
 import { renderDiff, renderWindowTable } from "./compare";
 import { Segmented, iconButton, toggleSwitch } from "./components";
-import { CATEGORY_LABELS, LAYER_LABELS, clockLabel, fmtInt, type Layer, type SliceResult } from "./config";
+import { CATEGORY_LABELS, LAYER_LABELS, clockLabel, fmtInt, nowMinute, todayDayType, type Layer, type SliceResult } from "./config";
 import { Data } from "./data";
 import { Dots } from "./dots";
 import { icons } from "./icons";
@@ -19,14 +19,18 @@ const meta = data.meta;
 if (import.meta.env.DEV) Object.assign(window, { __data: data });
 const [dy0, dy1] = meta.defaultYears;
 const all: Slice = { y0: dy0, y1: dy1, sex: "all", age: "all", emp: "all", kids: "all", day: "all" };
+// A fresh visit (no time or slice in the URL) starts live and on today's kind of day.
+const startParams = new URLSearchParams(location.search);
+let autoDay = !startParams.has("t") && !startParams.has("a");
 const totalDiaries = Object.values(meta.nByYear).reduce((a, b) => a + b, 0);
 
 const store = new Store({
   view: innerWidth < 700 ? "ribbon" : "day",
   layer: "act",
-  a: all,
+  a: autoDay ? { ...all, day: todayDayType() } : all,
   b: { ...all, emp: "employed", kids: "none", day: "weekday" },
-  t: 0,
+  t: nowMinute(),
+  live: true,
   speed: 1,
   playing: false,
   flows: true,
@@ -47,7 +51,7 @@ const HEADLINES: Record<View, { kicker: string; title: string; dek: string }> = 
   day: {
     kicker: "The day",
     title: "What is America doing right now?",
-    dek: `Each dot is one person's day, drawn from ${fmtInt.format(totalDiaries)} survey diaries. Press play and watch the country wake up, go to work, come home and fall asleep.`,
+    dek: `Live, it follows your clock and whether today is a weekday or weekend. Each dot is one person's day at that hour in their own time zone, drawn from ${fmtInt.format(totalDiaries)} survey diaries. Press play and watch the country wake up, go to work, come home and fall asleep.`,
   },
   ribbon: {
     kicker: "Time ribbon",
@@ -256,7 +260,7 @@ async function renderDayView(s: AppState, my: number) {
   const badgeSlot = h("div");
   const stage = h("div", { class: "dots-holder" });
 
-  const play = iconButton(s.playing ? "Pause" : "Play", s.playing ? icons.pause : icons.play, () => store.set({ playing: !store.state.playing }), "play-btn");
+  const play = iconButton(s.playing ? "Pause" : "Play", s.playing ? icons.pause : icons.play, () => store.set({ playing: !store.state.playing, live: false }), "play-btn");
   const scrubber = h("div", {
     class: "scrubber",
     role: "slider",
@@ -273,10 +277,10 @@ async function renderDayView(s: AppState, my: number) {
       : ev.key === "Home" ? 0 : ev.key === "End" ? 1439 : ev.key === "PageUp" ? t + 120 : ev.key === "PageDown" ? t - 120 : null;
     if (next !== null) {
       ev.preventDefault();
-      store.set({ t: (next + 1440) % 1440, playing: false });
+      store.set({ t: (next + 1440) % 1440, playing: false, live: false });
     } else if (ev.key === " " || ev.key === "Enter") {
       ev.preventDefault();
-      store.set({ playing: !store.state.playing });
+      store.set({ playing: !store.state.playing, live: false });
     }
   });
   const speed = new Segmented<string>("Playback speed", [0.5, 1, 2, 4].map((v) => ({ value: String(v), label: v === 0.5 ? "½×" : `${v}×` })), String(s.speed), (v) => store.set({ speed: +v }), { size: "sm" });
@@ -284,7 +288,9 @@ async function renderDayView(s: AppState, my: number) {
 
   const card = h("section", { class: "card stage" },
     h("div", { class: "stage__top" },
-      h("div", { class: "clock-display", "aria-live": "off" }, clockTime, clockAmpm),
+      h("div", { class: "stage__clock" },
+        h("div", { class: "clock-display", "aria-live": "off" }, clockTime, clockAmpm),
+        nowButton(s.live)),
       badgeSlot),
     stage,
     h("div", { class: "dock" },
@@ -301,7 +307,7 @@ async function renderDayView(s: AppState, my: number) {
   if (import.meta.env.DEV) Object.assign(window, { __dots: dots });
   dots.setMinute(s.t);
   dots.start();
-  dayRibbon = new Ribbon(scrubber, { height: innerWidth <= 720 ? 44 : 48, compact: true, scrub: (m) => store.set({ t: m, playing: false }) });
+  dayRibbon = new Ribbon(scrubber, { height: innerWidth <= 720 ? 44 : 48, compact: true, scrub: (m) => store.set({ t: m, playing: false, live: false }) });
   syncClock(s.t);
 
   const [res, sample] = await Promise.all([getShares(s.a, s.layer), (ensureEngine(), data.sampleDiaries(s.a))]);
@@ -319,6 +325,21 @@ async function renderDayView(s: AppState, my: number) {
   syncClock(store.state.t);
   stage.setAttribute("role", "img");
   stage.setAttribute("aria-label", `${dotStates.act.length} resampled diaries grouped by ${layerNoun(s.layer)}`);
+}
+
+/** Live: a status pill with a pulse. Otherwise: a button that snaps back to the visitor's clock. */
+function nowButton(live: boolean): HTMLButtonElement {
+  const b = h("button", { type: "button", class: "now-btn" }, h("span", { class: "now-btn__dot", "aria-hidden": "true" }), h("span", { class: "now-btn__label" }));
+  b.addEventListener("click", () => store.set({ live: true, playing: false, t: nowMinute() }));
+  syncNowButton(b, live);
+  return b;
+}
+
+function syncNowButton(b: HTMLButtonElement, live: boolean) {
+  b.classList.toggle("is-live", live);
+  b.setAttribute("aria-pressed", String(live));
+  b.title = live ? "Following your local time" : "Jump to your local time";
+  b.querySelector(".now-btn__label")!.textContent = live ? "Live · your time" : "Back to now";
 }
 
 function syncClock(t: number) {
@@ -484,10 +505,23 @@ addEventListener("keydown", (ev) => {
   const t = ev.target as HTMLElement;
   if (t.closest("button, input, select, textarea, [role=slider], a")) return;
   ev.preventDefault();
-  store.set({ playing: !store.state.playing });
+  store.set({ playing: !store.state.playing, live: false });
 });
 
+// Live mode: keep t on the visitor's wall clock. Checked every second so the minute flips on time.
+const followClock = () => {
+  const s = store.state;
+  if (!s.live) return;
+  const patch: Partial<AppState> = { t: nowMinute() };
+  if (autoDay && s.a.day !== todayDayType()) patch.a = { ...s.a, day: todayDayType() };
+  store.set(patch);
+};
+setInterval(followClock, 1000);
+document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && followClock());
+
 store.on((s, changed) => {
+  // Once someone picks a different day filter, stop overriding it.
+  if (changed.has("a") && s.a.day !== todayDayType()) autoDay = false;
   if (changed.has("theme")) applyTheme(s.theme);
   if (changed.has("view")) {
     nav.set(s.view);
@@ -506,6 +540,10 @@ store.on((s, changed) => {
   if (changed.has("year") && yearsHook && !structural) yearsHook(s.year);
   if (changed.has("flows")) dots?.setFlows(s.flows);
   if (changed.has("t")) syncClock(s.t);
+  if (changed.has("live")) {
+    const nb = viewEl.querySelector<HTMLButtonElement>(".now-btn");
+    if (nb) syncNowButton(nb, s.live);
+  }
   if (changed.has("playing")) {
     setPlaying(s.playing);
     const btn = viewEl.querySelector<HTMLButtonElement>(".stage .play-btn");
