@@ -1,0 +1,30 @@
+tewhere,description,group
+-3,Don't know,not_recorded
+-2,Refused,not_recorded
+-1,Not collected (sleep / grooming / personal activities),not_recorded
+1,Respondent's home or yard,home
+2,Respondent's workplace,workplace
+3,Someone else's home,other_home
+4,Restaurant or bar,stores
+5,Place of worship,other_place
+6,Grocery store,stores
+7,Other store/mall,stores
+8,School,other_place
+9,Outdoors away from home,outdoors
+10,Library,other_place
+11,Other place,other_place
+12,"Car, truck, or motorcycle (driver)",vehicle
+13,"Car, truck, or motorcycle (passenger)",vehicle
+14,Walking,transit_walk
+15,Bus,transit_walk
+16,Subway/train,transit_walk
+17,Bicycle,transit_walk
+18,Boat/ferry,transit_walk
+19,Taxi/limousine service,vehicle
+20,Airplane,transit_walk
+21,Other mode of transportation,transit_walk
+30,Bank,stores
+31,Gym/health club,other_place
+32,Post Office,stores
+89,Unspecified place,other_place
+99,Unspecified mode of transportation,transit_walk

@@ -19,3 +19,6 @@ build/
 .venv/
 __pycache__/
 *.pyc
+
+# Data (BLS raw + generated)
+/data/

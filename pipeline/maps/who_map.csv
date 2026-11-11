@@ -1,0 +1,30 @@
+tuwho_code,description,group,priority
+22,Own household child,own_kids,1
+40,Own nonhousehold child < 18,own_kids,1
+20,Spouse,partner,2
+21,Unmarried partner,partner,2
+55,Co-workers/colleagues/clients (2003-2009),coworkers,3
+59,Boss or manager,coworkers,3
+60,People whom I supervise,coworkers,3
+61,Co-workers,coworkers,3
+62,Customers,coworkers,3
+54,Friends,friends,4
+23,Grandchild,family,5
+24,Parent,family,5
+25,Brother/sister,family,5
+26,Other related person,family,5
+27,Foster child,family,5
+51,Parents (not living in household),family,5
+52,Other nonhousehold family members < 18,family,5
+53,Other nonhousehold family members 18+,family,5
+28,Housemate/roommate,others,6
+29,Roomer/boarder,others,6
+30,Other nonrelative,others,6
+56,Neighbors/acquaintances,others,6
+57,Other nonhousehold children < 18,others,6
+58,Other nonhousehold adults 18+,others,6
+18,Alone,alone,7
+19,Alone,alone,7
+-1,Not asked (sleep / grooming / personal activities),not_recorded,9
+-2,Refused,not_recorded,9
+-3,Don't know,not_recorded,9

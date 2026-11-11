@@ -1,0 +1,108 @@
+{
+ "source": "BLS American Time Use Survey 2003-2025 multi-year microdata (released June 2026)",
+ "built": "2026-11-10",
+ "latestYear": 2025,
+ "defaultYears": [
+  2023,
+  2025
+ ],
+ "minN": 100,
+ "bin": 10,
+ "layers": {
+  "act": [
+   "sleep",
+   "personal_care",
+   "eating",
+   "household",
+   "caring",
+   "shopping",
+   "work",
+   "education",
+   "travel",
+   "socializing",
+   "leisure",
+   "sports",
+   "unknown"
+  ],
+  "loc": [
+   "home",
+   "other_home",
+   "workplace",
+   "stores",
+   "other_place",
+   "outdoors",
+   "vehicle",
+   "transit_walk",
+   "not_recorded"
+  ],
+  "who": [
+   "alone",
+   "partner",
+   "own_kids",
+   "family",
+   "friends",
+   "coworkers",
+   "others",
+   "not_recorded"
+  ]
+ },
+ "filters": {
+  "sex": {
+   "m": "sex = 1",
+   "f": "sex = 2"
+  },
+  "age": {
+   "15-24": "age_band = 0",
+   "25-34": "age_band = 1",
+   "35-44": "age_band = 2",
+   "45-54": "age_band = 3",
+   "55-64": "age_band = 4",
+   "65+": "age_band = 5"
+  },
+  "emp": {
+   "employed": "emp in (1, 2)",
+   "ft": "emp = 1",
+   "pt": "emp = 2",
+   "unemp": "emp = 3",
+   "nilf": "emp = 4"
+  },
+  "kids": {
+   "none": "kids = 0",
+   "any": "kids > 0",
+   "u6": "kids = 1",
+   "6-12": "kids = 2",
+   "13-17": "kids = 3"
+  },
+  "day": {
+   "weekday": "day = 0",
+   "weekend": "day = 1",
+   "holiday": "day = 2"
+  }
+ },
+ "sharesSql": "\nwith r as (select rid, w from respondents where {where}),\ntot as (select sum(w) as sw from r),\ne as (select e.{layer} as cat, e.start, e.stop, r.w from episodes e join r using (rid)),\nd as (select cat, m, sum(dw) as dw from (\n        select cat, start as m, w as dw from e union all select cat, stop as m, -w as dw from e)\n      group by cat, m),\ng as (select c.cat, t.m from (select distinct cat from d) c, range(0, 1440) t(m)),\ncum as (select g.cat, g.m, sum(coalesce(d.dw, 0)) over (partition by g.cat order by g.m rows unbounded preceding) as active\n        from g left join d using (cat, m))\nselect cat, m // {BIN} as bin, sum(active) / ({BIN} * (select sw from tot)) as share from cum group by cat, bin\n",
+ "nByYear": {
+  "2003": 20720,
+  "2004": 13973,
+  "2005": 13038,
+  "2006": 12943,
+  "2007": 12248,
+  "2008": 12723,
+  "2009": 13133,
+  "2010": 13260,
+  "2011": 12479,
+  "2012": 12443,
+  "2013": 11385,
+  "2014": 11592,
+  "2015": 10905,
+  "2016": 10493,
+  "2017": 10223,
+  "2018": 9593,
+  "2019": 9435,
+  "2020": 8782,
+  "2021": 9087,
+  "2022": 8136,
+  "2023": 8548,
+  "2024": 7669,
+  "2025": 6146
+ }
+}
