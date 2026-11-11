@@ -1,4 +1,6 @@
-import { CATEGORY_LABELS, NBINS, clockLabel, colorFor, type Layer } from "./config";
+import { CATEGORY_LABELS, NBINS, colorFor, type Layer } from "./config";
+
+const UI_FONT = `"Inter Variable", system-ui, sans-serif`;
 
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 
@@ -197,7 +199,7 @@ export class Dots {
     });
     const clamp = (c: Cluster) => {
       c.x = Math.max(c.r + 8, Math.min(this.w - c.r - 8, c.x));
-      c.y = Math.max(c.r + 40, Math.min(this.hgt - c.r - 34, c.y));
+      c.y = Math.max(c.r + 44, Math.min(this.hgt - c.r - 38, c.y));
     };
     for (let iter = 0; iter < 40; iter++) {
       cl.forEach(clamp);
@@ -413,22 +415,44 @@ export class Dots {
     const labels = Object.values(CATEGORY_LABELS[this.layer]);
     const small = this.w < 560;
     ctx.textBaseline = "middle";
-    this.clusters.forEach((c, k) => {
+    // Biggest blobs claim label space first; smaller ones nudge up/down to fit, or skip.
+    const placed: { l: number; r: number; t: number; b: number }[] = [];
+    const lineGap = small ? 15 : 17;
+    const order = this.clusters.map((_, k) => k).sort((a, b) => this.clusters[b].count - this.clusters[a].count);
+    for (const k of order) {
+      const c = this.clusters[k];
+      if (!c.count && small) continue;
       const d = Math.max(this.cr[k], 6) + 10;
       const x = this.cx[k] + c.ux * d, y = this.cy[k] + c.uy * d;
-      ctx.textAlign = Math.abs(c.ux) < 0.3 ? "center" : c.ux > 0 ? "left" : "right";
-      const yy = Math.max(12, Math.min(this.hgt - 30, Math.abs(c.ux) < 0.3 ? y + (c.uy > 0 ? 8 : -14) : y - 6));
-      ctx.font = `600 ${small ? 11 : 12.5}px system-ui, sans-serif`;
+      const centered = Math.abs(c.ux) < 0.3;
+      const pctText = n ? `${((100 * c.count) / n).toFixed(1)}%` : "";
+      ctx.font = `600 ${small ? 13 : 14}px ${UI_FONT}`;
+      const wLabel = ctx.measureText(labels[k]).width;
+      ctx.font = `500 13px ${UI_FONT}`;
+      const wPct = ctx.measureText(pctText).width;
+      const wMax = Math.max(wLabel, wPct);
+      const anchor = centered ? 0.5 : c.ux > 0 ? 0 : 1;
+      const left = Math.max(4, Math.min(this.w - 4 - wMax, x - anchor * wMax));
+      const baseY = centered ? y + (c.uy > 0 ? 8 : -14) : y - 6;
+      let yy = -1;
+      for (const dy of [0, -16, 16, -32, 32]) {
+        const ty = Math.max(12, Math.min(this.hgt - 30, baseY + dy));
+        const box = { l: left - 3, r: left + wMax + 3, t: ty - 9, b: ty + lineGap + 9 };
+        if (!placed.some((p) => box.l < p.r && box.r > p.l && box.t < p.b && box.b > p.t)) {
+          placed.push(box);
+          yy = ty;
+          break;
+        }
+      }
+      if (yy < 0) continue;
+      const lineX = (wd: number) => left + anchor * (wMax - wd);
+      ctx.textAlign = "left";
+      ctx.font = `600 ${small ? 13 : 14}px ${UI_FONT}`;
       ctx.fillStyle = c.count ? this.ink.primary : this.ink.secondary;
-      ctx.fillText(labels[k], x, yy);
-      ctx.font = `${small ? 10.5 : 12}px system-ui, sans-serif`;
+      ctx.fillText(labels[k], lineX(wLabel), yy);
+      ctx.font = `500 13px ${UI_FONT}`;
       ctx.fillStyle = this.ink.secondary;
-      ctx.fillText(n ? `${((100 * c.count) / n).toFixed(1)}%` : "", x, yy + (small ? 13 : 15));
-    });
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    ctx.fillStyle = this.ink.primary;
-    ctx.font = `700 ${small ? 20 : 28}px system-ui, sans-serif`;
-    ctx.fillText(clockLabel(this.minute), 12, 10);
+      ctx.fillText(pctText, lineX(wPct), yy + lineGap);
+    }
   }
 }

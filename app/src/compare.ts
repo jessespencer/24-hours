@@ -1,13 +1,14 @@
 import * as d3 from "d3";
 import { CATEGORY_LABELS, NBINS, clockLabel, colorFor, type Grid, type Layer } from "./config";
+import { Segmented } from "./components";
 import { h, tooltip } from "./ui";
 
-export const WINDOWS: Record<string, { label: string; from: number; to: number }> = {
-  day: { label: "Whole day", from: 0, to: 1440 },
-  morning: { label: "Morning, 6–9 a.m.", from: 120, to: 300 },
-  workday: { label: "Workday, 9 a.m.–5 p.m.", from: 300, to: 780 },
-  evening: { label: "Evening, 5–10 p.m.", from: 780, to: 1080 },
-  night: { label: "Night, 10 p.m.–4 a.m.", from: 1080, to: 1440 },
+export const WINDOWS: Record<string, { label: string; short: string; from: number; to: number }> = {
+  day: { label: "Over the whole day", short: "All day", from: 0, to: 1440 },
+  morning: { label: "In the morning, 6–9 a.m.", short: "Morning", from: 120, to: 300 },
+  workday: { label: "During the workday, 9 a.m.–5 p.m.", short: "Workday", from: 300, to: 780 },
+  evening: { label: "In the evening, 5–10 p.m.", short: "Evening", from: 780, to: 1080 },
+  night: { label: "At night, 10 p.m.–4 a.m.", short: "Night", from: 1080, to: 1440 },
 };
 
 /** Average minutes per person spent in each category within [from, to). */
@@ -32,8 +33,8 @@ export function renderDiff(el: HTMLElement, a: Grid, b: Grid, layer: Layer, onHo
   const order = Object.keys(keys);
   const width = Math.max(300, el.clientWidth);
   const narrow = width < 560;
-  const m = { t: 6, r: 8, b: 26, l: narrow ? 108 : 172 };
-  const rowH = narrow ? 16 : 18;
+  const m = { t: 6, r: 8, b: 28, l: narrow ? 128 : 196 };
+  const rowH = narrow ? 20 : 22;
   const hgt = m.t + m.b + rowH * order.length;
   const x = d3.scaleLinear().domain([0, 1440]).range([m.l, width - m.r]);
   const diff = a.map((row, c) => row.map((v, i) => (v - b[c][i]) / 100)); // percentage points
@@ -41,7 +42,7 @@ export function renderDiff(el: HTMLElement, a: Grid, b: Grid, layer: Layer, onHo
   const interp = diverging();
   const color = (d: number) => interp(0.5 + d / (2 * maxAbs));
 
-  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${width} ${hgt}`).attr("width", width).attr("height", hgt).attr("class", "diff");
+  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${width} ${hgt}`).attr("width", width).attr("height", hgt).attr("class", "diff is-revealing");
   const cw = (width - m.l - m.r) / NBINS;
   order.forEach((k, c) => {
     const g = svg.append("g").attr("transform", `translate(0,${m.t + c * rowH})`);
@@ -70,9 +71,9 @@ export function renderDiff(el: HTMLElement, a: Grid, b: Grid, layer: Layer, onHo
     });
 
   const scale = h("div", { class: "div-scale" },
-    h("span", {}, `B higher (−${maxAbs.toFixed(0)} pts)`),
+    h("span", { class: "div-scale__b" }, `B higher (−${maxAbs.toFixed(0)} pts)`),
     h("span", { class: "bar", style: `background:linear-gradient(90deg, ${d3.range(0, 1.01, 0.1).map((t) => interp(t)).join(",")})` }),
-    h("span", {}, `A higher (+${maxAbs.toFixed(0)} pts)`));
+    h("span", { class: "div-scale__a" }, `A higher (+${maxAbs.toFixed(0)} pts)`));
   el.append(scale);
 }
 
@@ -86,17 +87,12 @@ export function renderWindowTable(el: HTMLElement, a: Grid, b: Grid, layer: Laye
   const rows = order.map((k, c) => ({ k, label: keys[k], a: ma[c], b: mb[c], d: ma[c] - mb[c] })).sort((p, q) => Math.abs(q.d) - Math.abs(p.d));
   const maxD = Math.max(1, ...rows.map((r) => Math.abs(r.d)));
 
-  const tabs = h("div", { class: "seg", role: "tablist" });
-  for (const [k, w] of Object.entries(WINDOWS)) {
-    const btn = h("button", { role: "tab", "aria-selected": String(k === win) }, w.label);
-    btn.addEventListener("click", () => onWin(k));
-    tabs.append(btn);
-  }
+  const tabs = new Segmented("Time window", Object.entries(WINDOWS).map(([k, w]) => ({ value: k, label: w.short, hint: w.label })), win in WINDOWS ? win : "evening", onWin, { size: "sm" }).el;
   const fmt = (m: number) => (W.to - W.from >= 600 ? `${(m / 60).toFixed(2)} h` : `${m.toFixed(0)} min`);
   const top = rows.filter((r) => Math.abs(r.d) >= 3).slice(0, 3);
   const sentence = top.length
-    ? `${W.label}: compared with B, A spends ` + top.map((r) => `${Math.abs(r.d).toFixed(0)} ${r.d > 0 ? "more" : "fewer"} minutes on ${r.label.toLowerCase()}`).join(", ") + "."
-    : `${W.label}: no category differs by 3 minutes or more.`;
+    ? `${W.label}, A spends ` + top.map((r) => `${Math.abs(r.d).toFixed(0)} ${r.d > 0 ? "more" : "fewer"} minutes on ${r.label.toLowerCase()}`).join(", ") + " than B."
+    : `${W.label}, no activity differs by 3 minutes or more.`;
 
   const table = h("table", { class: "wtable" });
   table.innerHTML = `<thead><tr><th>${layer === "act" ? "Activity" : layer === "loc" ? "Where" : "With whom"}</th><th class="num">A</th><th class="num">B</th><th class="num">A − B</th><th class="bar-col"></th></tr></thead>`;

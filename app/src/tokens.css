@@ -1,0 +1,255 @@
+/*
+ * 24 Hours design tokens. One source for type, space, shape, depth, motion and
+ * color; components only read var(--…). Dark mode re-steps the same roles.
+ *
+ * Chart surfaces stay at the values the data palette was validated against
+ * (--surface-1: #fcfcfb light / #1a1a19 dark), so the colorblind checks hold.
+ */
+:root {
+  /* Type */
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-md: 15px;
+  --fs-lg: clamp(17px, 1.4vw, 19px);
+  --fs-xl: clamp(21px, 2.2vw, 26px);
+  --fs-2xl: clamp(28px, 3.6vw, 40px);
+  --fs-display: clamp(38px, 5.4vw, 64px);
+  --lh-tight: 1.08;
+  --lh-snug: 1.3;
+  --lh-body: 1.55;
+  --tracking-caps: 0.08em;
+
+  /* Space (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 72px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --container: 1240px;
+
+  /* Shape */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+  --hit: 40px; /* minimum control height; 44px on touch */
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --dur-3: 420ms;
+
+  /* Neutral surfaces & ink (light) */
+  color-scheme: light;
+  --surface-0: #f3f0e9; /* page: warm paper */
+  --surface-1: #fcfcfb; /* cards & charts (validated) */
+  --surface-2: #ffffff; /* raised: menus, tooltip, dock */
+  --surface-sunk: #ece8df; /* wells: segmented tracks, chips */
+  --border: #e3dfd5;
+  --border-strong: #cfcabd;
+  --grid: #ebe7de;
+  --text-1: #15140f;
+  --text-2: #4f4d46;
+  --text-3: #646158;
+  --ink-inverse: #fcfcfb;
+  --accent: #2a63c4;
+  --focus: #2a78d6;
+  --warn: #9a4d00;
+  --warn-bg: #fbecd9;
+  --shadow-1: 0 1px 2px rgba(31, 26, 14, 0.06), 0 1px 1px rgba(31, 26, 14, 0.04);
+  --shadow-2: 0 10px 30px -12px rgba(31, 26, 14, 0.22), 0 2px 6px rgba(31, 26, 14, 0.06);
+  --shadow-3: 0 24px 60px -20px rgba(31, 26, 14, 0.35);
+  --glow: radial-gradient(1200px 600px at 50% -10%, rgba(255, 214, 153, 0.35), transparent 60%);
+
+  /* Compare slices: A and B wear the poles of the difference scale */
+  --slice-a: #2a63c4;
+  --slice-a-soft: #dbe7fa;
+  --slice-b: #b8322f;
+  --slice-b-soft: #f8dedc;
+  --on-slice: #ffffff;
+
+  /* Activity: validated stack-order palette (light) */
+  --c-act-sleep: #22509a;
+  --c-act-personal_care: #8a9a00;
+  --c-act-eating: #0e8fa3;
+  --c-act-household: #eb6834;
+  --c-act-caring: #1baf7a;
+  --c-act-shopping: #eda100;
+  --c-act-work: #e87ba4;
+  --c-act-education: #008300;
+  --c-act-travel: #6250d6;
+  --c-act-socializing: #e34948;
+  --c-act-leisure: #b04fb0;
+  --c-act-sports: #c2410c;
+  --c-act-unknown: #b9b8b2;
+
+  /* Location / company: reference categorical order */
+  --c-loc-home: #2a78d6;
+  --c-loc-other_home: #eb6834;
+  --c-loc-workplace: #1baf7a;
+  --c-loc-stores: #eda100;
+  --c-loc-other_place: #e87ba4;
+  --c-loc-outdoors: #008300;
+  --c-loc-vehicle: #6250d6;
+  --c-loc-transit_walk: #e34948;
+  --c-loc-not_recorded: #b9b8b2;
+  --c-who-alone: #2a78d6;
+  --c-who-partner: #eb6834;
+  --c-who-own_kids: #1baf7a;
+  --c-who-family: #eda100;
+  --c-who-friends: #e87ba4;
+  --c-who-coworkers: #008300;
+  --c-who-others: #6250d6;
+  --c-who-not_recorded: #b9b8b2;
+
+  /* Diverging: A higher = blue, B higher = red, gray midpoint */
+  --div-a-2: #104281;
+  --div-a-1: #6da7ec;
+  --div-mid: #f0efec;
+  --div-b-1: #ee8c8b;
+  --div-b-2: #a12a2a;
+}
+
+@media (pointer: coarse) {
+  :root { --hit: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
+}
+
+/* Dark roles. Declared twice: once for the OS setting, once for the in-app toggle. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #0f0f0e;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --surface-sunk: #141413;
+    --border: #2e2e2b;
+    --border-strong: #42423d;
+    --grid: #262624;
+    --text-1: #f2f0ea;
+    --text-2: #c4c1b6;
+    --text-3: #9d9a8f;
+    --ink-inverse: #121211;
+    --accent: #8fb4f2;
+    --focus: #6da7ec;
+    --warn: #f0a24a;
+    --warn-bg: #2e2112;
+    --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-2: 0 14px 34px -14px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+    --shadow-3: 0 28px 70px -20px rgba(0, 0, 0, 0.9);
+    --glow: radial-gradient(1200px 600px at 50% -10%, rgba(80, 110, 200, 0.18), transparent 60%);
+    --slice-a: #7fb0f0;
+    --slice-a-soft: #1b2a44;
+    --slice-b: #f08c88;
+    --slice-b-soft: #3c1d1c;
+    --on-slice: #121211;
+    --c-act-sleep: #3f74d6;
+    --c-act-personal_care: #8f9f10;
+    --c-act-eating: #13a2b2;
+    --c-act-household: #d95926;
+    --c-act-caring: #199e70;
+    --c-act-shopping: #c98500;
+    --c-act-work: #d55181;
+    --c-act-education: #008300;
+    --c-act-travel: #9085e9;
+    --c-act-socializing: #e66767;
+    --c-act-leisure: #c065c0;
+    --c-act-sports: #d4702f;
+    --c-act-unknown: #5d5c57;
+    --c-loc-home: #3987e5;
+    --c-loc-other_home: #d95926;
+    --c-loc-workplace: #199e70;
+    --c-loc-stores: #c98500;
+    --c-loc-other_place: #d55181;
+    --c-loc-outdoors: #008300;
+    --c-loc-vehicle: #9085e9;
+    --c-loc-transit_walk: #e66767;
+    --c-loc-not_recorded: #5d5c57;
+    --c-who-alone: #3987e5;
+    --c-who-partner: #d95926;
+    --c-who-own_kids: #199e70;
+    --c-who-family: #c98500;
+    --c-who-friends: #d55181;
+    --c-who-coworkers: #008300;
+    --c-who-others: #9085e9;
+    --c-who-not_recorded: #5d5c57;
+    --div-a-2: #86b6ef;
+    --div-a-1: #256abf;
+    --div-mid: #383835;
+    --div-b-1: #b33a3a;
+    --div-b-2: #f0a3a3;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #0f0f0e;
+  --surface-1: #1a1a19;
+  --surface-2: #232321;
+  --surface-sunk: #141413;
+  --border: #2e2e2b;
+  --border-strong: #42423d;
+  --grid: #262624;
+  --text-1: #f2f0ea;
+  --text-2: #c4c1b6;
+  --text-3: #9d9a8f;
+  --ink-inverse: #121211;
+  --accent: #8fb4f2;
+  --focus: #6da7ec;
+  --warn: #f0a24a;
+  --warn-bg: #2e2112;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 14px 34px -14px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-3: 0 28px 70px -20px rgba(0, 0, 0, 0.9);
+  --glow: radial-gradient(1200px 600px at 50% -10%, rgba(80, 110, 200, 0.18), transparent 60%);
+  --slice-a: #7fb0f0;
+  --slice-a-soft: #1b2a44;
+  --slice-b: #f08c88;
+  --slice-b-soft: #3c1d1c;
+  --on-slice: #121211;
+  --c-act-sleep: #3f74d6;
+  --c-act-personal_care: #8f9f10;
+  --c-act-eating: #13a2b2;
+  --c-act-household: #d95926;
+  --c-act-caring: #199e70;
+  --c-act-shopping: #c98500;
+  --c-act-work: #d55181;
+  --c-act-education: #008300;
+  --c-act-travel: #9085e9;
+  --c-act-socializing: #e66767;
+  --c-act-leisure: #c065c0;
+  --c-act-sports: #d4702f;
+  --c-act-unknown: #5d5c57;
+  --c-loc-home: #3987e5;
+  --c-loc-other_home: #d95926;
+  --c-loc-workplace: #199e70;
+  --c-loc-stores: #c98500;
+  --c-loc-other_place: #d55181;
+  --c-loc-outdoors: #008300;
+  --c-loc-vehicle: #9085e9;
+  --c-loc-transit_walk: #e66767;
+  --c-loc-not_recorded: #5d5c57;
+  --c-who-alone: #3987e5;
+  --c-who-partner: #d95926;
+  --c-who-own_kids: #199e70;
+  --c-who-family: #c98500;
+  --c-who-friends: #d55181;
+  --c-who-coworkers: #008300;
+  --c-who-others: #9085e9;
+  --c-who-not_recorded: #5d5c57;
+  --div-a-2: #86b6ef;
+  --div-a-1: #256abf;
+  --div-mid: #383835;
+  --div-b-1: #b33a3a;
+  --div-b-2: #f0a3a3;
+}

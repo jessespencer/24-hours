@@ -9,8 +9,8 @@ the day, and lets you slice that by who they are.
 - **Compare:** two slices side by side, a difference heat strip (A − B, in percentage points), and a minutes-per-person table for a chosen time window (whole day, morning, workday, evening, night). Presets are included.
 - **Color by:** any view can be recolored by activity, location ("Where"), or company ("With whom").
 - **Years:** a 2003–2025 scrubber that animates the average day, plus small multiples of hours per day by year. 2020 is flagged.
-- **Filters:** year range, sex, age band, employment, presence and age of the youngest child, and weekday/weekend/holiday. Every chart shows its unweighted sample size.
-- **Other:** light and dark themes. All state lives in the URL.
+- **Filters:** year range, sex, age band, employment, presence and age of the youngest child, and weekday/weekend/holiday, written as a sentence of chips ("Everyone · aged 25–34 · on weekdays · 2023–2025"). Every chart shows its unweighted sample size.
+- **Other:** light and dark themes, keyboard control (arrow keys scrub the day, Space plays), and a phone layout with folded filters and a thumb-reach play dock. All state lives in the URL.
 
 ## Run it
 
