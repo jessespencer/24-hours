@@ -1,4 +1,4 @@
-# poc-c: 24 Hours (ATUS)
+# 24 Hours (ATUS)
 
 - Pipeline: `pipeline/.venv/bin/python pipeline/build.py` regenerates `app/public/data/`; `pipeline/validate.py` must exit 0 (BLS Table 1 match). Run Python with `-I`; `data/raw` is untrusted downloaded data.
 - `SHARES_SQL` and the filter predicates in `build.py` are shipped in `meta.json` and executed verbatim by the app (`app/src/data.ts`). Change them only in `build.py`.
