@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 
-// Served as a GitHub Pages project site at https://jessedestroys.com/24-hours/.
+// Served as a GitHub Pages project site at https://jessespencer.dev/24-hours/.
 // The base must match the repo name; data fetches use import.meta.env.BASE_URL.
 export default defineConfig({
   base: "/24-hours/",

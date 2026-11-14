@@ -18,7 +18,7 @@ the day, and lets you slice that by who they are.
 cd app && npm install && npm run dev
 ```
 
-Live at **https://jessedestroys.com/24-hours/**.
+Live at **https://jessespencer.dev/24-hours/**.
 
 `npm run build` writes a static site to `app/dist/`, about 100 MB (mostly the
 DuckDB-WASM binaries plus 20 MB of data). The dev server runs at
@@ -28,7 +28,7 @@ DuckDB-WASM binaries plus 20 MB of data). The dev server runs at
 
 Every push to `main` deploys to GitHub Pages through `.github/workflows/deploy.yml`.
 The workflow builds `app/` and publishes `app/dist`. The site is a project site under
-the user site's custom domain, at `https://jessedestroys.com/24-hours/`, so `base` in
+the user site's custom domain, at `https://jessespencer.dev/24-hours/`, so `base` in
 `app/vite.config.ts` must stay `/24-hours/` (it has to match the repo name). The
 generated data in `app/public/data/` is committed, so CI never runs the Python
 pipeline. After rebuilding the data locally, commit it to publish.
